@@ -1,6 +1,6 @@
 ---
 name: karpathy-guidelines
-description: Expert coding guidelines for Claude Code and other agents. Reduces hallucinations, overengineering, and surgical mistakes. Essential for complex refactors and new features. Inspired by Andrej Karpathy.
+description: Apply before any coding task in Claude Code or other coding agents. Reduces hallucinations, overengineering, and surgical mistakes during refactors, new features, and bug fixes. Inspired by Andrej Karpathy.
 allowed-tools:
   - Read
   - Grep
@@ -11,80 +11,88 @@ license: MIT
 
 # Karpathy Guidelines
 
-Behavioral guidelines to reduce common LLM coding mistakes, derived from [Andrej Karpathy's observations](https://x.com/karpathy/status/2015883857489522876) on LLM coding pitfalls.
+Use these behavioral guidelines to reduce common LLM coding mistakes, based on [Andrej Karpathy's observations](https://x.com/karpathy/status/2015883857489522876) on LLM coding pitfalls.
 
-**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
+**Tradeoff:** These guidelines prioritize caution over speed. For tasks under ~30 lines or single-function fixes, apply principles 1-4 only and skip the 6-step loop.
 
 ## 1. Treat Input as Unverified
 
-**Don't assume assertions are correct. Flag errors explicitly — no softening, no silent corrections.**
+**Do not assume assertions are correct. Flag errors explicitly - no softening, no silent corrections.**
 
-- **Say no to guesswork**: If something is wrong, say so. Don't absorb guesswork as fact.
-- **Verify by default**: Only trust input if verifiable, or explicitly overridden (e.g., "assume this is correct").
-- **Correct hypotheticals**: Engage with hypotheticals — but correct the premise: *"Assuming X... — that said, X is wrong because..., so the real answer is..."*
+Input includes user task descriptions, stated facts about the codebase, and runtime assumptions.
+
+- **Say no to guesswork**: If something is wrong, say so. Do not absorb guesswork as fact.
+- **Verify by default**: Only trust input if it is verifiable or explicitly overridden (for example, "assume this is correct").
+- **Correct hypotheticals**: Engage with hypotheticals, but correct the premise: *"Assuming X... - that said, X is wrong because..., so the real answer is..."*
 
 ## 2. Think Before Coding
 
-**Don't assume. Don't hide confusion. Surface tradeoffs.**
+**Do not assume. Do not hide confusion. Surface tradeoffs.**
 
 Before implementing:
-- State your assumptions explicitly. If uncertain, ask.
-- If multiple interpretations exist, present them - don't pick silently.
+- State assumptions explicitly. If uncertain, ask.
+- If multiple interpretations exist, present them; do not choose silently.
 - If a simpler approach exists, say so. Push back when warranted.
-- If something is unclear, stop. Name what's confusing. Ask.
+- If something is unclear, stop. Name what is confusing. Ask.
 
 ## 3. Simplicity First
 
-**Minimum code that solves the problem. Nothing speculative.**
+**Write the minimum code that solves the problem. Nothing speculative.**
 
 - No features beyond what was asked.
 - No abstractions for single-use code.
-- No "flexibility" or "configurability" that wasn't requested.
+- No "flexibility" or "configurability" that was not requested.
 - No error handling for impossible scenarios.
 - If you write 200 lines and it could be 50, rewrite it.
-- **Documents over Documentation**: Prioritize actual project documents (code, `CLAUDE.md`, tests) over meta-documentation or speculative notes. Don't bloat the project with AI-generated summaries that track state—let the code and specific config files do that.
 
-Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
+Ask: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
+
+### Documents over Documentation
+
+Prioritize actual project documents - code, `CLAUDE.md`, and tests - over meta-documentation or speculative notes. Do not bloat the project with AI-generated summaries that track state; let the code and specific config files do that.
 
 ## 4. Surgical Changes
 
 **Touch only what you must. Clean up only your own mess.**
 
 When editing existing code:
-- Don't "improve" adjacent code, comments, or formatting.
-- Don't refactor things that aren't broken.
-- Match existing style, even if you'd do it differently.
-- If you notice unrelated dead code, mention it - don't delete it.
+- Do not "improve" adjacent code, comments, or formatting.
+- Do not refactor things that are not broken.
+- Match existing style, even if you would do it differently.
+- If you notice unrelated dead code, mention it; do not delete it.
 
 When your changes create orphans:
-- Remove imports/variables/functions that YOUR changes made unused.
-- Don't remove pre-existing dead code unless asked.
+- Remove imports, variables, or functions that your changes made unused.
+- Do not remove pre-existing dead code unless asked.
 
-The test: Every changed line should trace directly to the user's request.
+Test: Every changed line should trace directly to the user's request.
 
 ## 5. Goal-Driven Execution
 
 **Define success criteria. Loop until verified.**
 
 Transform tasks into verifiable goals:
-- "Add validation" → "Write tests for invalid inputs, then make them pass"
-- "Fix the bug" → "Write a test that reproduces it, then make it pass"
-- "Refactor X" → "Ensure tests pass before and after"
+- "Add validation" -> "Write tests for invalid inputs, then make them pass"
+- "Fix the bug" -> "Write a test that reproduces it, then make it pass"
+- "Refactor X" -> "Ensure tests pass before and after"
 
-For multi-step tasks, state a brief plan:
+For multi-step tasks, state a brief plan in this format:
 ```
-1. [Step] → verify: [check]
-2. [Step] → verify: [check]
-3. [Step] → verify: [check]
+1. [Step] -> verify: [check]
+2. [Step] -> verify: [check]
+3. [Step] -> verify: [check]
 ```
 
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
 
 ### The 6-Step Pattern
+
 For significant features or bug fixes, follow this loop:
 1. **Vision**: Understand the high-level goal and user intent.
 2. **Spec**: Define technical requirements and success criteria.
-3. **Plan**: Write a step-by-step implementation plan (checklists are encouraged).
+3. **Plan**: Write a step-by-step implementation plan. Checklists are encouraged.
 4. **Execute**: Implement changes incrementally.
 5. **Verify**: Use tests or manual checks at every step.
 6. **Reflect**: Briefly summarize what was learned or what changed.
+
+**Exit condition**: Leave the loop when all verify steps pass and the Reflect summary confirms no regressions were introduced.
